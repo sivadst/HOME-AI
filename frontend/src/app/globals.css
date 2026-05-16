@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────
+   DESIGN SYSTEM TOKENS
+───────────────────────────────────────── */
+:root {
+  --void: #020408;
+  --deep: #04080f;
+  --surface: #070d1a;
+  --glass: rgba(12, 24, 48, 0.6);
+  --glass-heavy: rgba(4, 8, 15, 0.85);
+  --border: rgba(0, 200, 255, 0.12);
+  --border-bright: rgba(0, 200, 255, 0.35);
+  --border-subtle: rgba(0, 200, 255, 0.06);
+  
+  --cyan: #00c8ff;
+  --cyan-dim: rgba(0, 200, 255, 0.12);
+  --cyan-glow: rgba(0, 200, 255, 0.25);
+  --gold: #f0b429;
+  --gold-dim: rgba(240, 180, 41, 0.12);
+  --green: #00ff8c;
+  --green-dim: rgba(0, 255, 140, 0.1);
+  --red: #ff3c5f;
+  --red-dim: rgba(255, 60, 95, 0.1);
+  --purple: #a855f7;
+  --purple-dim: rgba(168, 85, 247, 0.12);
+  
+  --text-primary: #e8f4ff;
+  --text-secondary: rgba(180, 220, 255, 0.6);
+  --text-muted: rgba(100, 160, 220, 0.4);
+  --text-dim: rgba(60, 120, 180, 0.3);
+  
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+/* ─────────────────────────────────────────
+   BASE STYLES
+───────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--void);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY
+───────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+
+.text-hero {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+.text-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.text-value {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────
+   GLOW EFFECTS
+───────────────────────────────────────── */
+.glow-cyan { text-shadow: 0 0 20px rgba(0, 200, 255, 0.5), 0 0 40px rgba(0, 200, 255, 0.2); }
+.glow-gold { text-shadow: 0 0 20px rgba(240, 180, 41, 0.5); }
+.glow-green { text-shadow: 0 0 20px rgba(0, 255, 140, 0.5); }
+.glow-purple { text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+.glow-red { text-shadow: 0 0 20px rgba(255, 60, 95, 0.5); }
+
+.shadow-glow-cyan { box-shadow: 0 0 20px var(--cyan-glow), 0 0 60px rgba(0, 200, 255, 0.1); }
+.shadow-glow-gold { box-shadow: 0 0 20px rgba(240, 180, 41, 0.3); }
+.shadow-glow-green { box-shadow: 0 0 20px rgba(0, 255, 140, 0.3); }
+
+/* ─────────────────────────────────────────
+   GLASS MORPHISM
+───────────────────────────────────────── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+}
+
+.glass-heavy {
+  background: var(--glass-heavy);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--border);
+}
+
+.glass-panel {
+  background: var(--deep);
+  border: 1px solid var(--border);
+}
+
+/* ─────────────────────────────────────────
+   ANIMATION KEYFRAMES
+───────────────────────────────────────── */
+@keyframes orbit-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-ccw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes core-pulse {
+  0% { opacity: 0.6; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes data-flow {
+  0% { stroke-dashoffset: 300; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes neural-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin-logo {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* ─────────────────────────────────────────
+   UTILITY CLASSES
+───────────────────────────────────────── */
+.animate-orbit-cw { animation: orbit-cw 20s linear infinite; }
+.animate-orbit-ccw { animation: orbit-ccw 14s linear infinite; }
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+.animate-blink { animation: blink-cursor 1s step-end infinite; }
+.animate-slide-in-left { animation: slide-in-left 0.4s ease forwards; }
+.animate-slide-in-right { animation: slide-in-right 0.4s ease forwards; }
+.animate-fade-up { animation: fade-up 0.5s ease forwards; }
+.animate-spin-logo { animation: spin-logo 12s linear infinite; }
+.animate-pulse-ring { animation: pulse-ring 3s ease-out infinite; }
+
+.typing-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--cyan);
+  animation: blink-cursor 1s step-end infinite;
+  vertical-align: -2px;
+  margin-left: 2px;
+  border-radius: 1px;
+}
+
+/* ─────────────────────────────────────────
+   COMPONENT PRIMITIVES
+───────────────────────────────────────── */
+.panel-border {
+  border: 1px solid var(--border);
+}
+
+.panel-border-bright {
+  border: 1px solid var(--border-bright);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.badge-live {
+  background: var(--green-dim);
+  border: 1px solid rgba(0, 255, 140, 0.3);
+  color: var(--green);
+}
+
+.badge-warn {
+  background: var(--gold-dim);
+  border: 1px solid rgba(240, 180, 41, 0.3);
+  color: var(--gold);
+}
+
+.badge-crit {
+  background: var(--red-dim);
+  border: 1px solid rgba(255, 60, 95, 0.3);
+  color: var(--red);
+}
+
+.badge-info {
+  background: var(--cyan-dim);
+  border: 1px solid var(--border-bright);
+  color: var(--cyan);
+}
+
+/* ─────────────────────────────────────────
+   HOVER INTERACTIONS
+───────────────────────────────────────── */
+.interactive {
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-bright);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto;
+  }
+  
+  .sidebar-left,
+  .sidebar-right {
+    display: none;
+  }
+}
