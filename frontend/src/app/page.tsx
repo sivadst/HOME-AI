@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { TopBar } from '@/components/layout/TopBar'
 import { AgentSidebar } from '@/components/agents/AgentSidebar'
 import { CommandCenter } from '@/components/core/CommandCenter'
@@ -8,23 +8,33 @@ import { IntelFeed } from '@/components/analytics/IntelFeed'
 import { useStore, generateActivity } from '@/lib/store'
 
 export default function HomePage() {
-  const { updateAgentMetrics, updateMetrics, appendNeuralPoint, addActivity, incrementUptime } = useStore()
+  const updateAgentMetrics = useStore(s => s.updateAgentMetrics)
+  const updateMetrics      = useStore(s => s.updateMetrics)
+  const appendNeuralPoint  = useStore(s => s.appendNeuralPoint)
+  const addActivity        = useStore(s => s.addActivity)
+  const incrementUptime    = useStore(s => s.incrementUptime)
+
+  // Track refs for cleanup safety
+  const initialized = useRef(false)
 
   useEffect(() => {
-    // Agent metrics ticker
-    const agentTimer = setInterval(updateAgentMetrics, 3000)
-    // Global metrics ticker
-    const metricTimer = setInterval(updateMetrics, 2000)
-    // Neural series
-    const neuralTimer = setInterval(appendNeuralPoint, 2500)
-    // Activity stream
-    const activityTimer = setInterval(() => addActivity(generateActivity()), 4000)
-    // Uptime
-    const uptimeTimer = setInterval(incrementUptime, 1000)
+    if (initialized.current) return
+    initialized.current = true
 
-    // Seed initial activities
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => addActivity(generateActivity()), i * 200)
+    // Agent metrics ticker
+    const agentTimer    = setInterval(updateAgentMetrics, 3000)
+    // Global metrics ticker
+    const metricTimer   = setInterval(updateMetrics, 2000)
+    // Neural series — faster for smoother chart animation
+    const neuralTimer   = setInterval(appendNeuralPoint, 1800)
+    // Activity stream
+    const activityTimer = setInterval(() => addActivity(generateActivity()), 3500)
+    // Uptime
+    const uptimeTimer   = setInterval(incrementUptime, 1000)
+
+    // Seed initial activities for immediate visual density
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => addActivity(generateActivity()), i * 150)
     }
 
     return () => {
@@ -34,17 +44,21 @@ export default function HomePage() {
       clearInterval(activityTimer)
       clearInterval(uptimeTimer)
     }
-  }, [])
+  }, [updateAgentMetrics, updateMetrics, appendNeuralPoint, addActivity, incrementUptime])
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div
+      className="flex flex-col h-screen overflow-hidden relative"
+      style={{ zIndex: 10 }}
+    >
       <TopBar />
+
+      {/* ── MAIN 3-COLUMN LAYOUT ── */}
       <div
         className="flex-1 grid overflow-hidden"
         style={{
-          gridTemplateColumns: '280px 1fr 300px',
-          background: 'var(--border)',
-          gap: '1px',
+          gridTemplateColumns: '260px 1fr 280px',
+          gap: 0,
         }}
       >
         <AgentSidebar />

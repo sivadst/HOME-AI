@@ -108,8 +108,8 @@ export const useStore = create<Store>((set, get) => ({
     }))
   },
 
-  // Neural series
-  neuralSeries: Array(60).fill(0).map(() => Math.random() * 100),
+  // Neural series — deterministic seed to avoid hydration mismatch
+  neuralSeries: Array(60).fill(0).map((_, i) => 50 + 30 * Math.sin(i * 0.3) + 10 * Math.sin(i * 0.7)),
 
   appendNeuralPoint: () => {
     set((state) => ({
