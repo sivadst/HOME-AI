@@ -249,12 +249,14 @@ body {
   color: var(--green);
 }
 
+.badge-warning,
 .badge-warn {
   background: var(--gold-dim);
   border: 1px solid rgba(240, 180, 41, 0.3);
   color: var(--gold);
 }
 
+.badge-critical,
 .badge-crit {
   background: var(--red-dim);
   border: 1px solid rgba(255, 60, 95, 0.3);

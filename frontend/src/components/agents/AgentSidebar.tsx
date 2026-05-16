@@ -1,13 +1,12 @@
 'use client'
 
-import store from '@/lib/store'
+import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 
 export function AgentSidebar() {
-  // TODO: Replace with actual state management logic. Using dummy values for now.
-  const agents = [];
-  const selectedAgentId = null;
-  const setSelectedAgent = (_id: any) => {};
+  const agents = useStore((state) => state.agents)
+  const selectedAgentId = useStore((state) => state.selectedAgentId)
+  const setSelectedAgent = useStore((state) => state.setSelectedAgent)
 
   return (
     <aside
@@ -23,13 +22,18 @@ export function AgentSidebar() {
         }}
       >
         <span className="text-label">AI Civilization</span>
-        <span className="tag badge-live">10 AGENTS</span>
+        <span className="tag badge-live">{agents.length} AGENTS</span>
       </div>
 
       {/* Agent List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {agents.map((agent) => {
           const isSelected = agent.id === selectedAgentId
+          const statusColors = {
+            active: 'var(--green)',
+            idle: 'var(--text-muted)',
+            processing: 'var(--cyan)',
+          }
           return (
             <button
               key={agent.id}
@@ -51,7 +55,7 @@ export function AgentSidebar() {
               <span
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{
-                  background: `linear-gradient(135deg, transparent 60%, ${agent.colorDim})`,
+                  background: `linear-gradient(135deg, transparent 60%, ${agent.color}22)`,
                 }}
               />
 
@@ -59,9 +63,9 @@ export function AgentSidebar() {
               <div className="flex items-center gap-2.5 mb-2">
                 <span
                   className="w-7 h-7 rounded-md flex items-center justify-center text-sm flex-shrink-0"
-                  style={{ background: agent.colorDim }}
+                  style={{ background: `${agent.color}22` }}
                 >
-                  {agent.icon}
+                  ●
                 </span>
                 <div className="min-w-0 flex-1">
                   <div
@@ -74,7 +78,7 @@ export function AgentSidebar() {
                     className="text-[10px] font-mono truncate"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    {agent.role}
+                    {agent.status}
                   </div>
                 </div>
               </div>
@@ -83,16 +87,16 @@ export function AgentSidebar() {
               <div className="flex items-center justify-between mb-2">
                 <span
                   className="font-mono text-[9px] tracking-[0.1em]"
-                  style={{ color: agent.color }}
+                  style={{ color: statusColors[agent.status] }}
                 >
                   ● {agent.status}
                 </span>
                 <span className="font-mono text-[9px]" style={{ color: 'var(--text-muted)' }}>
-                  {Math.round(agent.cpu)}% CPU
+                  {agent.efficiency.toFixed(0)}% eff
                 </span>
               </div>
 
-              {/* CPU bar */}
+              {/* Efficiency bar */}
               <div
                 className="h-0.5 rounded-full overflow-hidden"
                 style={{ background: 'rgba(255,255,255,0.05)' }}
@@ -100,19 +104,19 @@ export function AgentSidebar() {
                 <div
                   className="h-full rounded-full transition-all duration-1000"
                   style={{
-                    width: `${agent.cpu}%`,
+                    width: `${agent.efficiency}%`,
                     background: `linear-gradient(90deg, ${agent.color}88, ${agent.color})`,
                   }}
                 />
               </div>
 
-              {/* Accuracy */}
+              {/* Process count */}
               <div className="flex justify-between mt-2">
                 <span className="font-mono text-[9px]" style={{ color: 'var(--text-muted)' }}>
-                  Tasks: {agent.tasks}
+                  Processes: {agent.processCount}
                 </span>
                 <span className="font-mono text-[9px]" style={{ color: agent.color }}>
-                  {agent.accuracy}% acc
+                  {agent.efficiency.toFixed(1)}% cap
                 </span>
               </div>
             </button>
@@ -127,7 +131,7 @@ export function AgentSidebar() {
       >
         <div className="flex justify-between items-center mb-1.5">
           <span className="text-label" style={{ fontSize: '9px' }}>System Health</span>
-          <span className="font-mono text-[10px] glow-green" style={{ color: 'var(--green)' }}>
+          <span className="font-mono text-[10px]" style={{ color: 'var(--green)' }}>
             99.97%
           </span>
         </div>
