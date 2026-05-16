@@ -3,9 +3,10 @@
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react'
 import { useStore } from '@/lib/store'
 
-/* ── Animated SVG Neural Graph ── */
+/* ── Cinematic Neural Graph with Flowing Intelligence ── */
 function NeuralGraph({ series }: { series: number[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const tickRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -20,88 +21,133 @@ function NeuralGraph({ series }: { series: number[] }) {
     const w = canvas.offsetWidth
     const h = canvas.offsetHeight
     ctx.clearRect(0, 0, w, h)
+    tickRef.current++
+    const t = tickRef.current
 
     if (series.length < 2) return
     const min = Math.min(...series)
     const max = Math.max(...series)
     const range = Math.max(max - min, 1)
     const step  = w / (series.length - 1)
-    const pts   = series.map((v, i) => ({
-      x: i * step,
-      y: h - ((v - min) / range) * h * 0.82 - h * 0.09,
-    }))
 
-    // Area fill
-    const fill = ctx.createLinearGradient(0, 0, 0, h)
-    fill.addColorStop(0, 'rgba(0,200,255,0.30)')
-    fill.addColorStop(0.6, 'rgba(0,200,255,0.08)')
-    fill.addColorStop(1, 'rgba(0,200,255,0)')
-    ctx.beginPath()
-    ctx.moveTo(pts[0].x, h)
-    pts.forEach(p => ctx.lineTo(p.x, p.y))
-    ctx.lineTo(pts[pts.length - 1].x, h)
-    ctx.closePath()
-    ctx.fillStyle = fill
-    ctx.fill()
+    // Helper: smooth bezier curve drawing
+    const drawSmoothCurve = (pts: Array<{x:number;y:number}>) => {
+      if (pts.length < 2) return
+      ctx.moveTo(pts[0].x, pts[0].y)
+      for (let i = 1; i < pts.length; i++) {
+        const prev = pts[i - 1]
+        const curr = pts[i]
+        const cpx = (prev.x + curr.x) / 2
+        ctx.quadraticCurveTo(prev.x, prev.y, cpx, (prev.y + curr.y) / 2)
+      }
+      const last = pts[pts.length - 1]
+      ctx.lineTo(last.x, last.y)
+    }
 
-    // Second series (phase-shifted) for depth
-    const pts2 = series.map((v, i) => ({
-      x: i * step,
-      y: h - ((v * 0.7 + 15 - min) / range) * h * 0.82 - h * 0.09,
-    }))
-    const fill2 = ctx.createLinearGradient(0, 0, 0, h)
-    fill2.addColorStop(0, 'rgba(168,85,247,0.18)')
-    fill2.addColorStop(1, 'rgba(168,85,247,0)')
-    ctx.beginPath()
-    ctx.moveTo(pts2[0].x, h)
-    pts2.forEach(p => ctx.lineTo(p.x, p.y))
-    ctx.lineTo(pts2[pts2.length - 1].x, h)
-    ctx.closePath()
-    ctx.fillStyle = fill2
-    ctx.fill()
+    // Generate 3 data layers
+    const pts1 = series.map((v, i) => ({ x: i * step, y: h - ((v - min) / range) * h * 0.78 - h * 0.1 }))
+    const pts2 = series.map((v, i) => ({ x: i * step, y: h - ((v * 0.65 + 20 - min) / range) * h * 0.78 - h * 0.1 }))
+    const pts3 = series.map((v, i) => ({ x: i * step, y: h - ((v * 0.45 + 30 - min) / range) * h * 0.78 - h * 0.1 }))
 
-    // Primary line
-    ctx.beginPath()
-    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y))
-    ctx.strokeStyle = '#00c8ff'
-    ctx.lineWidth = 1.8
-    ctx.shadowBlur = 12
-    ctx.shadowColor = '#00c8ff'
-    ctx.stroke()
-    ctx.shadowBlur = 0
+    // ── Background gradient mesh ──
+    const meshGrad = ctx.createRadialGradient(w * 0.7, h * 0.3, 0, w * 0.5, h * 0.5, w * 0.6)
+    meshGrad.addColorStop(0, 'rgba(0,200,255,0.04)')
+    meshGrad.addColorStop(0.5, 'rgba(168,85,247,0.02)')
+    meshGrad.addColorStop(1, 'transparent')
+    ctx.fillStyle = meshGrad
+    ctx.fillRect(0, 0, w, h)
 
-    // Secondary line
-    ctx.beginPath()
-    pts2.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y))
-    ctx.strokeStyle = 'rgba(168,85,247,0.7)'
-    ctx.lineWidth = 1.2
-    ctx.shadowBlur = 8
-    ctx.shadowColor = '#a855f7'
-    ctx.stroke()
-    ctx.shadowBlur = 0
-
-    // Grid lines
+    // ── Grid with animated pulse ──
     ctx.setLineDash([2, 6])
-    ctx.lineWidth = 0.5
-    for (let i = 1; i < 4; i++) {
-      const y = (h / 4) * i
-      ctx.strokeStyle = 'rgba(0,200,255,0.08)'
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(w, y)
-      ctx.stroke()
+    ctx.lineWidth = 0.4
+    for (let i = 1; i < 5; i++) {
+      const y = (h / 5) * i
+      ctx.strokeStyle = 'rgba(0,200,255,0.06)'
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke()
+    }
+    // Vertical grid with pulse on latest section
+    for (let i = 1; i < 12; i++) {
+      const x = (w / 12) * i
+      const pulse = i > 9 ? 0.12 : 0.04
+      ctx.strokeStyle = `rgba(0,200,255,${pulse})`
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke()
     }
     ctx.setLineDash([])
 
-    // Live point
-    const last = pts[pts.length - 1]
+    // ── Layer 3 (deepest, green) ──
+    const fill3 = ctx.createLinearGradient(0, 0, 0, h)
+    fill3.addColorStop(0, 'rgba(0,255,140,0.08)')
+    fill3.addColorStop(1, 'rgba(0,255,140,0)')
     ctx.beginPath()
-    ctx.arc(last.x, last.y, 3.5, 0, Math.PI * 2)
-    ctx.fillStyle = '#00c8ff'
-    ctx.shadowBlur = 18
-    ctx.shadowColor = '#00c8ff'
-    ctx.fill()
-    ctx.shadowBlur = 0
+    ctx.moveTo(pts3[0].x, h)
+    drawSmoothCurve(pts3)
+    ctx.lineTo(pts3[pts3.length-1].x, h); ctx.closePath()
+    ctx.fillStyle = fill3; ctx.fill()
+    ctx.beginPath(); drawSmoothCurve(pts3)
+    ctx.strokeStyle = 'rgba(0,255,140,0.35)'; ctx.lineWidth = 0.8; ctx.stroke()
+
+    // ── Layer 2 (mid, purple) ──
+    const fill2 = ctx.createLinearGradient(0, 0, 0, h)
+    fill2.addColorStop(0, 'rgba(168,85,247,0.15)')
+    fill2.addColorStop(1, 'rgba(168,85,247,0)')
+    ctx.beginPath()
+    ctx.moveTo(pts2[0].x, h)
+    drawSmoothCurve(pts2)
+    ctx.lineTo(pts2[pts2.length-1].x, h); ctx.closePath()
+    ctx.fillStyle = fill2; ctx.fill()
+    ctx.beginPath(); drawSmoothCurve(pts2)
+    ctx.strokeStyle = 'rgba(168,85,247,0.6)'; ctx.lineWidth = 1.0
+    ctx.shadowBlur = 6; ctx.shadowColor = '#a855f7'; ctx.stroke(); ctx.shadowBlur = 0
+
+    // ── Layer 1 (primary, cyan) ──
+    const fill1 = ctx.createLinearGradient(0, 0, 0, h)
+    fill1.addColorStop(0, 'rgba(0,200,255,0.28)')
+    fill1.addColorStop(0.5, 'rgba(0,200,255,0.10)')
+    fill1.addColorStop(1, 'rgba(0,200,255,0)')
+    ctx.beginPath()
+    ctx.moveTo(pts1[0].x, h)
+    drawSmoothCurve(pts1)
+    ctx.lineTo(pts1[pts1.length-1].x, h); ctx.closePath()
+    ctx.fillStyle = fill1; ctx.fill()
+
+    // Primary glow line
+    ctx.beginPath(); drawSmoothCurve(pts1)
+    ctx.strokeStyle = '#00c8ff'; ctx.lineWidth = 2.0
+    ctx.shadowBlur = 14; ctx.shadowColor = '#00c8ff'; ctx.stroke(); ctx.shadowBlur = 0
+    // Thin bright inner line
+    ctx.beginPath(); drawSmoothCurve(pts1)
+    ctx.strokeStyle = 'rgba(200,240,255,0.6)'; ctx.lineWidth = 0.8; ctx.stroke()
+
+    // ── Glowing peak nodes on primary ──
+    const avg = series.reduce((a,b) => a+b,0) / series.length
+    pts1.forEach((p, i) => {
+      const val = series[i]
+      if (val > avg * 1.15 || i === pts1.length - 1) {
+        const isLast = i === pts1.length - 1
+        const sz = isLast ? 4 : 2.5
+        // Outer glow
+        const rg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sz * 4)
+        rg.addColorStop(0, isLast ? 'rgba(0,200,255,0.25)' : 'rgba(0,200,255,0.12)')
+        rg.addColorStop(1, 'transparent')
+        ctx.fillStyle = rg; ctx.beginPath()
+        ctx.arc(p.x, p.y, sz * 4, 0, Math.PI * 2); ctx.fill()
+        // Core
+        ctx.beginPath(); ctx.arc(p.x, p.y, sz, 0, Math.PI * 2)
+        ctx.fillStyle = isLast ? '#fff' : '#00c8ff'
+        ctx.shadowBlur = isLast ? 22 : 10; ctx.shadowColor = '#00c8ff'
+        ctx.fill(); ctx.shadowBlur = 0
+      }
+    })
+
+    // ── Flowing pulse marker (animated vertical line) ──
+    const pulseX = w * (0.75 + 0.2 * Math.sin(t * 0.15))
+    const pulseGrad = ctx.createLinearGradient(0, 0, 0, h)
+    pulseGrad.addColorStop(0, 'rgba(0,200,255,0)')
+    pulseGrad.addColorStop(0.3, 'rgba(0,200,255,0.08)')
+    pulseGrad.addColorStop(0.7, 'rgba(0,200,255,0.08)')
+    pulseGrad.addColorStop(1, 'rgba(0,200,255,0)')
+    ctx.fillStyle = pulseGrad
+    ctx.fillRect(pulseX - 1, 0, 2, h)
   }, [series])
 
   return (
