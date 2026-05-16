@@ -1,10 +1,13 @@
 'use client'
 
-import { useStore } from '@/lib/store'
+import store from '@/lib/store'
 import { cn } from '@/lib/utils'
 
 export function AgentSidebar() {
-  const { agents, selectedAgentId, setSelectedAgent } = useStore()
+  // TODO: Replace with actual state management logic. Using dummy values for now.
+  const agents = [];
+  const selectedAgentId = null;
+  const setSelectedAgent = (_id: any) => {};
 
   return (
     <aside
