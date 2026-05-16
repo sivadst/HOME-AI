@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.env
+.DS_Store
+# Ignore build output
+dist/
+build/
+.next/
+out/
+# Ignore local IDE settings
+.vscode/
